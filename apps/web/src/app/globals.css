@@ -1,0 +1,232 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --foreground-rgb: 240, 246, 252;
+    --background-start-rgb: 7, 11, 17;
+    --background-end-rgb: 7, 11, 17;
+  }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    width: 100vw;
+    overflow-x: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', 'Segoe UI', Roboto, sans-serif;
+    letter-spacing: -0.011em;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* Staggered Physics-Based Fade Up Animations */
+@keyframes fadeUpIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.stagger-item-1 { animation: fadeUpIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.05s both; }
+.stagger-item-2 { animation: fadeUpIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.10s both; }
+.stagger-item-3 { animation: fadeUpIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both; }
+.stagger-item-4 { animation: fadeUpIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.20s both; }
+.stagger-item-5 { animation: fadeUpIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.25s both; }
+.stagger-item-6 { animation: fadeUpIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.30s both; }
+
+/* Interactive Hover Link: Expanding Underline from Center Outward */
+.nav-link-expand {
+  position: relative;
+  display: inline-block;
+}
+.nav-link-expand::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 1px;
+  background-color: currentColor;
+  transition: width 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.nav-link-expand:hover::after {
+  width: 100%;
+}
+
+/* Tactile Mechanical Button Click Compression & Zero Glow Depth */
+.btn-tactile {
+  transition: transform 0.08s ease-out, background-color 0.12s ease-out, border-color 0.12s ease-out;
+}
+.btn-tactile:active {
+  transform: scale(0.98);
+}
+
+/* Tabular Numerals for Jitter-Free Telemetry, Clocks, & Status Badges */
+.tnum,
+[data-tabular-nums='true'],
+.tabular-nums {
+  font-feature-settings: 'tnum' on, 'zero' on;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Rigid Structural Primitives - Anti-Shift Overrides */
+.static-target {
+  flex: 0 0 auto !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* Smooth Accordion Height Expansion via CSS Grid */
+.accordion-grid-wrapper {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 250ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.accordion-grid-wrapper.is-open {
+  grid-template-rows: 1fr;
+}
+.accordion-grid-inner {
+  overflow: hidden;
+}
+
+/* Tactile Physical SVG Film/Paper Grain Overlay */
+.organic-grain-overlay {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.034;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
+}
+
+/* Editor-Grade Solid Panels (Stripe / Linear / Tailwind UI Style) */
+.editor-panel-card {
+  background-color: var(--pg-surface, #18181B);
+  border: 1px solid var(--pg-border, #27272A);
+  border-radius: 8px;
+}
+
+/* Custom organic tactile scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 9999px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+/* Ensure Tldraw canvas container transparent background for living dynamic background layering */
+.spatial-canvas-overlay {
+  background: transparent !important;
+}
+
+.spatial-canvas-overlay .tl-container {
+  background: transparent !important;
+}
+
+.spatial-canvas-overlay .tl-canvas {
+  background: transparent !important;
+}
+
+.spatial-canvas-overlay .tl-background {
+  display: none !important;
+  background: transparent !important;
+}
+
+.spatial-canvas-overlay .tl-theme__dark,
+.spatial-canvas-overlay .tl-theme__light {
+  --color-background: transparent !important;
+}
+
+/* Strictly hide TLDraw default UI chrome so it never overlaps code lines */
+.spatial-canvas-overlay .tlui-layout,
+.spatial-canvas-overlay .tl-ui,
+.spatial-canvas-overlay .tlui-page-menu,
+.spatial-canvas-overlay .tlui-toolbar,
+.spatial-canvas-overlay .tlui-actions-menu,
+.spatial-canvas-overlay .tlui-quick-actions,
+.spatial-canvas-overlay .tlui-help-menu,
+.spatial-canvas-overlay .tlui-navigation-zone,
+.spatial-canvas-overlay [data-testid="page-menu"],
+.spatial-canvas-overlay .tl-page-menu {
+  display: none !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
+/* Suppress TLDraw selection outline, user selection, and resize handles when in Code mode */
+.spatial-canvas-overlay.pointer-events-none .tl-selection__fg,
+.spatial-canvas-overlay.pointer-events-none .tl-selection__bg,
+.spatial-canvas-overlay.pointer-events-none .tl-user-selection,
+.spatial-canvas-overlay.pointer-events-none .tl-user-indicator,
+.spatial-canvas-overlay.pointer-events-none [data-testid="selection-box"],
+.spatial-canvas-overlay.pointer-events-none [data-testid="selection-handle"],
+.spatial-canvas-overlay.pointer-events-none .tl-selection-box {
+  display: none !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
+/* Suppress selection outline for shapes that are hidden via layer management */
+.tl-shape[opacity="0"] .tl-selection__fg,
+.tl-shape[opacity="0"] .tl-user-selection,
+.tl-shape[opacity="0"] .tl-selection__bg {
+  display: none !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
+/* Typography definitions for spatial canvas text boxes */
+:root {
+  --tl-font-draw: 'Caveat', 'Comic Sans MS', cursive, sans-serif;
+  --tl-font-sans: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif;
+  --tl-font-serif: 'Georgia', 'Cambria', 'Times New Roman', serif;
+  --tl-font-mono: 'JetBrains Mono', 'Fira Code', 'SF Mono', Consolas, monospace;
+}
+
+/* Proper caret and text contrast for in-canvas text editing */
+.spatial-canvas-overlay .tl-text-input {
+  caret-color: var(--pg-accent, #3b82f6) !important;
+  color: inherit !important;
+  outline: none !important;
+}
+
+/* Ensure text shape wrappers render crisp typography with correct font families */
+.tl-text-wrapper[data-font='sans'] {
+  font-family: var(--tl-font-sans) !important;
+}
+.tl-text-wrapper[data-font='serif'] {
+  font-family: var(--tl-font-serif) !important;
+}
+.tl-text-wrapper[data-font='mono'] {
+  font-family: var(--tl-font-mono) !important;
+}
+.tl-text-wrapper[data-font='draw'] {
+  font-family: var(--tl-font-draw) !important;
+}
