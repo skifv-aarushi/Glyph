@@ -15,12 +15,18 @@ router.get('/github', (req: Request, res: Response) => {
     });
   }
 
-  const state = Math.random().toString(36).substring(2, 15);
+  // Preserve the caller origin (e.g. https://glyph-ebon.vercel.app) in state so callback returns there accurately
+  const returnOrigin = (req.query.origin as string) || req.headers.referer || config.clientOrigin || 'https://glyph-ebon.vercel.app';
+  const statePayload = Buffer.from(JSON.stringify({
+    nonce: Math.random().toString(36).substring(2, 15),
+    returnTo: returnOrigin.replace(/\/$/, '')
+  })).toString('base64');
+
   const authUrl = new URL('https://github.com/login/oauth/authorize');
   authUrl.searchParams.set('client_id', config.github.clientId);
   authUrl.searchParams.set('redirect_uri', config.github.callbackUrl);
   authUrl.searchParams.set('scope', config.github.scopes);
-  authUrl.searchParams.set('state', state);
+  authUrl.searchParams.set('state', statePayload);
 
   res.redirect(authUrl.toString());
 });
@@ -31,10 +37,21 @@ router.get('/github', (req: Request, res: Response) => {
 router.get('/github/callback', async (req: Request, res: Response) => {
   const code = req.query.code as string;
   const error = req.query.error as string;
+  const rawState = req.query.state as string;
+
+  let redirectTarget = config.clientOrigin.replace(/\/$/, '');
+  if (rawState) {
+    try {
+      const parsedState = JSON.parse(Buffer.from(rawState, 'base64').toString('utf-8'));
+      if (parsedState.returnTo) {
+        redirectTarget = parsedState.returnTo;
+      }
+    } catch {}
+  }
 
   if (error || !code) {
     console.error('[OAuth] Callback error or missing code:', error);
-    return res.redirect(`${config.clientOrigin}?auth_error=${encodeURIComponent(error || 'missing_code')}`);
+    return res.redirect(`${redirectTarget}?auth_error=${encodeURIComponent(error || 'missing_code')}`);
   }
 
   try {
@@ -63,7 +80,7 @@ router.get('/github/callback', async (req: Request, res: Response) => {
     if (!tokenData.access_token) {
       console.error('[OAuth] Token exchange failed:', tokenData);
       return res.redirect(
-        `${config.clientOrigin}?auth_error=${encodeURIComponent(tokenData.error_description || 'token_exchange_failed')}`
+        `${redirectTarget}?auth_error=${encodeURIComponent(tokenData.error_description || 'token_exchange_failed')}`
       );
     }
 
@@ -80,7 +97,7 @@ router.get('/github/callback', async (req: Request, res: Response) => {
 
     if (!userResponse.ok) {
       console.error('[OAuth] Failed to fetch user profile:', userResponse.statusText);
-      return res.redirect(`${config.clientOrigin}?auth_error=profile_fetch_failed`);
+      return res.redirect(`${redirectTarget}?auth_error=profile_fetch_failed`);
     }
 
     const userData = (await userResponse.json()) as {
@@ -102,20 +119,20 @@ router.get('/github/callback', async (req: Request, res: Response) => {
     // 3. Sign JWT containing GitHub token and profile
     const signedJwt = signAuthToken({ githubToken, user });
 
-    // 4. Set secure HTTP-only cookie
+    // 4. Set secure cross-site cookie
     res.cookie(config.cookieName, signedJwt, {
       httpOnly: true,
-      secure: config.isProduction,
-      sameSite: config.isProduction ? 'none' : 'lax',
+      secure: true,
+      sameSite: 'none',
       path: '/',
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
-    // 5. Redirect back to client app
-    return res.redirect(`${config.clientOrigin}?auth_success=true`);
+    // 5. Redirect back to client app with auth_success and token for immediate localStorage sync
+    return res.redirect(`${redirectTarget}?auth_success=true&token=${encodeURIComponent(signedJwt)}`);
   } catch (err: any) {
     console.error('[OAuth] Exception in GitHub callback:', err);
-    return res.redirect(`${config.clientOrigin}?auth_error=internal_server_error`);
+    return res.redirect(`${redirectTarget}?auth_error=internal_server_error`);
   }
 });
 

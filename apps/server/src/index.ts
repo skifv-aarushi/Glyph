@@ -27,7 +27,27 @@ initWebSocketServer(server);
 // Security and parsing middlewares
 app.use(
   cors({
-    origin: [config.clientOrigin, 'http://localhost:3000', 'http://127.0.0.1:3000'],
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps, curl, or server-to-server)
+      if (!origin) return callback(null, true);
+
+      const normalizedOrigin = origin.replace(/\/$/, '');
+      const configuredOrigin = (config.clientOrigin || '').replace(/\/$/, '');
+
+      // Allow configured client origin, Vercel deployments, or local development
+      if (
+        !configuredOrigin ||
+        configuredOrigin === '*' ||
+        normalizedOrigin === configuredOrigin ||
+        normalizedOrigin.endsWith('.vercel.app') ||
+        normalizedOrigin.includes('localhost') ||
+        normalizedOrigin.includes('127.0.0.1')
+      ) {
+        return callback(null, true);
+      }
+
+      return callback(null, true); // Fallback allow in production to prevent CORS lockouts
+    },
     credentials: true,
   })
 );
