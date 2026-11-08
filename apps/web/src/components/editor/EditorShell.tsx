@@ -902,7 +902,7 @@ export const EditorShell: React.FC<EditorShellProps> = ({ initialRoomId }) => {
 
   // Wheel forwarding: in Draw Mode, mouse wheel events over canvas scroll Monaco smoothly
   const handleCanvasWheel = (e: React.WheelEvent) => {
-    if (interactionMode !== 'draw' || !monacoEditorRef.current) return;
+    if (!monacoEditorRef.current) return;
 
     // Preserve Tldraw pinch-to-zoom gestures when Ctrl/Cmd is active
     if (e.ctrlKey || e.metaKey) {
@@ -912,8 +912,8 @@ export const EditorShell: React.FC<EditorShellProps> = ({ initialRoomId }) => {
     // Stop propagation so Tldraw canvas internal pan listeners do not fight Monaco scroll binding
     e.stopPropagation();
 
-    // Responsive trackpad acceleration multiplier
-    const multiplier = e.deltaMode === 1 ? 24 : 1.75;
+    // Responsive trackpad / mousewheel acceleration multiplier
+    const multiplier = e.deltaMode === 1 ? 24 : 1.0;
     const currentScrollTop = monacoEditorRef.current.getScrollTop();
     const currentScrollLeft = monacoEditorRef.current.getScrollLeft();
     monacoEditorRef.current.setScrollPosition({

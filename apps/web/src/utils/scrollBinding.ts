@@ -28,10 +28,16 @@ export function bindMonacoToTldrawScroll(
   monacoEditor: monaco.editor.IStandaloneCodeEditor,
   tldrawEditor: TldrawEditor
 ): ScrollBindingInstance {
-  let ticking = false;
-  let rafId: number | null = null;
-  let latestScrollLeft = monacoEditor.getScrollLeft();
-  let latestScrollTop = monacoEditor.getScrollTop();
+  // Prevent Tldraw's internal gesture engine from overriding camera coordinates with arbitrary canvas panning
+  try {
+    tldrawEditor.setCameraOptions({
+      wheelBehavior: 'none',
+      panSpeed: 0,
+      isLocked: false,
+    });
+  } catch (err) {
+    console.warn('[scrollBinding] setCameraOptions error:', err);
+  }
 
   const applyCameraOffset = (scrollLeft: number, scrollTop: number) => {
     try {
@@ -40,13 +46,13 @@ export function bindMonacoToTldrawScroll(
       const targetX = -Math.round(scrollLeft);
       const targetY = -Math.round(scrollTop);
 
-      // Instantaneous 1:1 camera sync - eliminates 1-frame RAF phase lag during high-velocity trackpad scrolling
+      // Instantaneous 1:1 camera sync with force: true
       if (currentCamera.x !== targetX || currentCamera.y !== targetY) {
         tldrawEditor.setCamera({
           x: targetX,
           y: targetY,
           z: currentZ,
-        });
+        }, { force: true });
       }
     } catch (err) {
       console.warn('[scrollBinding] applyCameraOffset error:', err);
