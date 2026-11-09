@@ -1,5 +1,8 @@
 # Glyph: Distributed Spatial Collaborative Code Engine
 
+> **Live Deployment:** [glyph-ebon.vercel.app](https://glyph-ebon.vercel.app)  
+> **Backend Gateway:** [glyph-server-e7zs.onrender.com](https://glyph-server-e7zs.onrender.com/health)
+
 Glyph is an experimental distributed systems and computer graphics project that unifies a discrete text-buffer code editor (**Monaco / VS Code Editor Core**) with a continuous 2D affine vector canvas (**Tldraw**) at 60 frames per second. State convergence across spatial diagrams and code abstract syntax trees is maintained through conflict-free replicated data types (Yjs CRDTs), distributed mutex locks, and an isolated multi-language compiler pipeline.
 
 ## 1. System Architecture & Component Topology
